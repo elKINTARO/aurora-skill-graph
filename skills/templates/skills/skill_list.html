@@ -43,6 +43,36 @@
                                     <li>{{ dependency.to_skill.title }}</li>
                                 {% endfor %}
                             </ul>
+                            <hr>
+
+                    {% if user.is_authenticated %}
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            {% if skill.my_status == 'done' %}
+                                <span class="badge bg-success">✅ Вивчено</span>
+                            {% elif skill.my_status == 'in_progress' %}
+                                <span class="badge bg-warning text-dark">⏳ Вчу зараз...</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark border">Ще не вчив</span>
+                            {% endif %}
+
+                            <div class="btn-group">
+                                {% if skill.my_status != 'in_progress' and skill.my_status != 'done' %}
+                                    <a href="{% url 'change_status' skill.slug 'in_progress' %}" class="btn btn-sm btn-outline-primary">Почати</a>
+                                {% endif %}
+
+                                {% if skill.my_status == 'in_progress' %}
+                                    <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-sm btn-outline-success">Завершити</a>
+                                {% endif %}
+
+                                {% if skill.my_status == 'done' %}
+                                    <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-sm btn-outline-secondary">Скинути</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <small class="text-muted text-center d-block">Увійдіть, щоб відмічати прогрес</small>
+                    {% endif %}
                         </div>
                     {% endif %}
                 </div>
