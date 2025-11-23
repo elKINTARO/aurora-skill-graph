@@ -1,0 +1,39 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card-locked {
+    opacity: 0.75;
+    background-color: #f2f2f2;
+    transition: opacity 0.3s ease;
+}
+.card-locked:hover {
+    opacity: 0.9;
+}
+
+.difficulty-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-border-todo { border-left: 5px solid #6c757d; }        /* Сірий */
+.status-border-in_progress { border-left: 5px solid #ffc107; } /* Жовтий */
+.status-border-done { border-left: 5px solid #198754; }        /* Зелений */
+.status-border-locked { border-left: 5px solid #adb5bd; }      /* Світло-сірий */
+
+.requirements-list {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.btn-action {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+}

@@ -5,17 +5,39 @@ from .models import Skill, UserSkillProgress
 def skill_list(request):
     skills = Skill.objects.prefetch_related(
         'requires__from_skill',
-        'required_by__to_skill',
-    ).all()
+        'required_by__to_skill'
+    ).order_by('category', 'difficulty', 'title').all()
 
     if request.user.is_authenticated:
-        user_progress = {
+        user_progress_qs = UserSkillProgress.objects.filter(user=request.user)
+
+        user_progress_map = {
             p.skill_id: p.status
-            for p in UserSkillProgress.objects.filter(user=request.user)
+            for p in user_progress_qs
+        }
+
+        completed_ids = {
+            p.skill_id
+            for p in user_progress_qs
+            if p.status == 'done'
         }
 
         for skill in skills:
-            skill.my_status = user_progress.get(skill.id, 'todo')
+            skill.my_status = user_progress_map.get(skill.id, 'todo')
+
+            skill.is_locked = False
+
+            for req in skill.requires.all():
+                if req.from_skill.id in completed_ids:
+                    req.is_met = True
+                else:
+                    req.is_met = False
+
+                if req.dependency_type == 'hard' and not req.is_met:
+                    skill.is_locked = True
+
+    else:
+        pass
 
     return render(request, 'skills/skill_list.html', {'skills': skills})
 
