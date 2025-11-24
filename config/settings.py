@@ -9,6 +9,14 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
+#Video embending fix
+
+SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

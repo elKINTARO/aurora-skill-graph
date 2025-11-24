@@ -1,6 +1,25 @@
+from django.db.models import Sum, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Skill, UserSkillProgress
+
+
+@login_required
+def user_profile(request):
+    user_progress = UserSkillProgress.objects.filter(user=request.user).select_related('skill')
+    in_progress_skills = user_progress.filter(status='in_progress')
+    finished_skills = user_progress.filter(status='done')
+    total_xp = finished_skills.aggregate(
+        total_points=Sum(F('skill__difficulty') * 10)
+    )['total_points'] or 0
+
+    context = {
+        'in_progress': in_progress_skills,
+        'finished_count': finished_skills.count(),
+        'total_xp': total_xp,
+    }
+
+    return render(request, 'skills/profile.html', context)
 
 def skill_list(request):
     skills = Skill.objects.prefetch_related(

@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.skill_list, name='skill_list'),
     path('skill/<slug:skill_slug>/', views.skill_detail, name='skill_detail'),
     path('skill/<slug:skill_slug>/change/<str:new_status>/', views.change_status, name='change_status'),
+path('profile/', views.user_profile, name='profile'),
 ]

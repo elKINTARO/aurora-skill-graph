@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Мій Профіль | Aurora</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
+    <a href="{% url 'skill_list' %}" class="btn btn-outline-light btn-sm">← До всіх навичок</a>
+  </div>
+</nav>
+
+<div class="container">
+
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="text-primary">👤 Особистий кабінет</h1>
+            <p class="text-muted">Користувач: <strong>{{ user.username }}</strong></p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card text-white bg-primary mb-3 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">⚡ Загальний досвід (XP)</h5>
+                    <p class="display-4 fw-bold">{{ total_xp }}</p>
+                    <p class="card-text"><small>Бали нараховуються за складність завдань.</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">📚 Вивчено навичок</h5>
+                    <p class="display-4 fw-bold">{{ finished_count }}</p>
+                    <p class="card-text"><small>Keep going!</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="border-bottom pb-2 mb-3">🔥 Зараз в роботі</h3>
+
+    <div class="row">
+        {% for item in in_progress %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 status-border-in_progress shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'skill_detail' item.skill.slug %}" class="text-decoration-none text-dark stretched-link">
+                                {{ item.skill.title }}
+                            </a>
+                        </h5>
+                        <span class="badge bg-light text-dark border mb-2">{{ item.skill.get_difficulty_display }}</span>
+                        <p class="card-text small text-muted">{{ item.skill.category }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="progress" style="height: 5px;">
+                          <div class="progress-bar bg-warning" role="progressbar" style="width: 50%"></div>
+                        </div>
+                        <small class="text-muted">В процесі...</small>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Ви поки нічого не вчите. <a href="{% url 'skill_list' %}">Оберіть нову ціль!</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>

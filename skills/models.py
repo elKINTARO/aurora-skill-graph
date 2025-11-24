@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -14,7 +15,9 @@ class Skill(models.Model):
     category = models.CharField(max_length=100, verbose_name="Категорія")
     difficulty = models.IntegerField(choices=DIFFICULTY_CHOICES, default=1, verbose_name="Складність")
 
-    description = models.TextField(blank=True, verbose_name="Опис")
+    description = models.TextField(blank=True, verbose_name="Опис (Markdown)")
+    video_url = models.URLField(blank=True, null=True, verbose_name="Посилання на відео (YouTube)")
+
     #Directed Graph
     dependencies = models.ManyToManyField(
         'self',
@@ -23,21 +26,42 @@ class Skill(models.Model):
         related_name='related_to'
     )
 
+    def get_video_id(self):
+        """
+        Витягує ID відео за допомогою регулярних виразів.
+        Це найнадійніший спосіб.
+        """
+        if not self.video_url:
+            return None
+
+        # Цей вираз шукає 11 символів (цифри, букви, -, _),
+        # які йдуть після "v=", "embed/" або "youtu.be/"
+        regex = r'(?:v=|/|embed/|youtu\.be/)([0-9A-Za-z_-]{11})'
+
+        match = re.search(regex, self.video_url)
+
+        if match:
+            return match.group(1)  # Повертає чистий ID
+        return None
+
     def __str__(self):
         return f"{self.title} ({self.get_difficulty_display()})"
 
     class Meta:
         verbose_name = "Навичка"
         verbose_name_plural = "Навички"
+        ordering = ['category', 'difficulty', 'title']
+
 
 class SkillDependency(models.Model):
     DEPENDENCY_TYPE = [
         ('hard', 'Обовʼязково'),
         ('soft', 'Бажано'),
     ]
-    #parent
+
+    # from_skill
     from_skill = models.ForeignKey(Skill, related_name='required_by', on_delete=models.CASCADE)
-    #child
+    # to_skill
     to_skill = models.ForeignKey(Skill, related_name='requires', on_delete=models.CASCADE)
 
     dependency_type = models.CharField(max_length=10, choices=DEPENDENCY_TYPE, default='hard')
@@ -49,6 +73,7 @@ class SkillDependency(models.Model):
 
     def __str__(self):
         return f"{self.from_skill.title} -> {self.to_skill.title}"
+
 
 class UserSkillProgress(models.Model):
     STATUS_CHOICES = [

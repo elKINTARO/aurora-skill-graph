@@ -15,7 +15,9 @@
     <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
     <div class="d-flex align-items-center">
         {% if user.is_authenticated %}
-            <span class="text-light me-3 small d-none d-md-inline">Привіт, {{ user.username }}</span>
+            <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">
+                👤 Профіль
+            </a>
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
                 <button class="btn btn-outline-secondary btn-sm text-white">Вихід</button>
