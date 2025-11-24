@@ -1,15 +1,57 @@
-{% extends 'base.html' %} {% block title %}Всі навички | Aurora{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Мої навички | Aurora{% endblock %}
 
 {% block content %}
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">Моя карта знань</h1>
         <a href="{% url 'skill_create' %}" class="btn btn-success shadow-sm">
-            + Додати навичку
+            + Нова навичка
         </a>
     </div>
 
-    {% if not skills %}
+    <div class="card shadow-sm mb-5 border-0 bg-white">
+        <div class="card-body p-3">
+            <form method="get" class="row g-2 align-items-center">
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">🔍</span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0"
+                               placeholder="Пошук навички..."
+                               value="{{ search_query }}"> </div>
+                </div>
+
+                <div class="col-md-4">
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Всі категорії --</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
+                                {{ cat }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary">
+                        Скинути
+                    </a>
+                </div>
+
+                <button type="submit" hidden></button>
+            </form>
+        </div>
+    </div>
+
+    {% if not skills and search_query %}
+        <div class="text-center py-5">
+            <h4 class="text-muted">За запитом "{{ search_query }}" нічого не знайдено 🤷‍♂️</h4>
+            <a href="{% url 'skill_list' %}" class="btn btn-link">Показати всі навички</a>
+        </div>
+
+    {% elif not skills and not search_query %}
         <div class="text-center py-5">
             <div class="mb-3">
                 <span style="font-size: 3rem;">🌱</span>
@@ -105,10 +147,6 @@
                 </div>
                 {% endfor %}
             </div>
-        </div>
-    {% empty %}
-        <div class="text-center py-5">
-            <h4>Навичок ще немає.</h4>
         </div>
     {% endfor %}
 

@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Sum, F
@@ -27,46 +28,55 @@ def user_profile(request):
 
     return render(request, 'skills/profile.html', context)
 
-@login_required
+
+from django.db.models import Q  # <--- Додай цей імпорт зверху
+
+
 @never_cache
+@login_required
 def skill_list(request):
     skills = Skill.objects.filter(author=request.user).prefetch_related(
         'requires__from_skill',
         'required_by__to_skill'
     ).order_by('category', 'difficulty', 'title')
 
-    if request.user.is_authenticated:
-        user_progress_qs = UserSkillProgress.objects.filter(user=request.user)
+    categories = Skill.objects.filter(author=request.user).values_list('category', flat=True).distinct()
 
-        user_progress_map = {
-            p.skill_id: p.status
-            for p in user_progress_qs
-        }
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
 
-        completed_ids = {
-            p.skill_id
-            for p in user_progress_qs
-            if p.status == 'done'
-        }
+    if search_query:
+        skills = skills.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
 
-        for skill in skills:
-            skill.my_status = user_progress_map.get(skill.id, 'todo')
+    if category_filter:
+        skills = skills.filter(category=category_filter)
 
-            skill.is_locked = False
+    user_progress_qs = UserSkillProgress.objects.filter(user=request.user)
+    user_progress_map = {p.skill_id: p.status for p in user_progress_qs}
+    completed_ids = {p.skill_id for p in user_progress_qs if p.status == 'done'}
 
-            for req in skill.requires.all():
+    for skill in skills:
+        skill.my_status = user_progress_map.get(skill.id, 'todo')
+        skill.is_locked = False
+        for req in skill.requires.all():
+            if req.dependency_type == 'hard':
                 if req.from_skill.id in completed_ids:
                     req.is_met = True
                 else:
                     req.is_met = False
-
-                if req.dependency_type == 'hard' and not req.is_met:
                     skill.is_locked = True
 
-    else:
-        pass
+    context = {
+        'skills': skills,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+    }
 
-    return render(request, 'skills/skill_list.html', {'skills': skills})
+    return render(request, 'skills/skill_list.html', context)
 
 @login_required
 def change_status(request, skill_slug, new_status):
