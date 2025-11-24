@@ -1,7 +1,12 @@
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Sum, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Skill, UserSkillProgress
+from django.views.decorators.cache import never_cache
+from django.utils.text import slugify
+from .forms import SkillForm
 
 
 @login_required
@@ -21,11 +26,13 @@ def user_profile(request):
 
     return render(request, 'skills/profile.html', context)
 
+@login_required
+@never_cache
 def skill_list(request):
-    skills = Skill.objects.prefetch_related(
+    skills = Skill.objects.filter(author=request.user).prefetch_related(
         'requires__from_skill',
         'required_by__to_skill'
-    ).order_by('category', 'difficulty', 'title').all()
+    ).order_by('category', 'difficulty', 'title')
 
     if request.user.is_authenticated:
         user_progress_qs = UserSkillProgress.objects.filter(user=request.user)
@@ -74,6 +81,7 @@ def change_status(request, skill_slug, new_status):
 
     return redirect('skill_list')
 
+@never_cache
 def skill_detail(request, skill_slug):
     skill = get_object_or_404(Skill, slug=skill_slug)
     if request.user.is_authenticated:
@@ -98,3 +106,34 @@ def skill_detail(request, skill_slug):
                         break
 
     return render(request, 'skills/skill_detail.html', {'skill': skill})
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('skill_list')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/register.html', {'form': form})
+
+
+@login_required
+def skill_create(request):
+    if request.method == 'POST':
+        form = SkillForm(request.POST)
+        if form.is_valid():
+            skill = form.save(commit=False)
+            skill.author = request.user
+            base_slug = slugify(skill.title)
+            skill.slug = f"{base_slug}-{request.user.id}-{Skill.objects.count()}"
+            skill.save()
+
+            return redirect('skill_list')
+    else:
+        form = SkillForm()
+
+    return render(request, 'skills/skill_form.html', {'form': form})

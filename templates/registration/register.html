@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Реєстрація | Aurora{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow border-0">
+            <div class="card-body p-5">
+                <h3 class="text-center mb-4 text-primary">🚀 Приєднатися</h3>
+                <p class="text-center text-muted mb-4 small">Створіть акаунт, щоб відстежувати свій прогрес</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2 small">
+                            <ul class="mb-0 ps-3">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">{{ field.label }}</label>
+
+                            <div class="input-group">
+                                {{ field }}
+                            </div>
+
+                            {% if field.help_text %}
+                                <div class="form-text small" style="font-size: 0.75rem;">{{ field.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Зареєструватися</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="text-center small">
+                    Вже є акаунт? <a href="{% url 'login' %}" class="fw-bold text-decoration-none">Увійти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('form input').forEach(input => {
+        input.classList.add('form-control');
+    });
+</script>
+
+{% endblock %}

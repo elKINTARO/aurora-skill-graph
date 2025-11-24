@@ -14,6 +14,7 @@ class Skill(models.Model):
     slug = models.SlugField(unique=True, verbose_name="URL ідентифікатор")
     category = models.CharField(max_length=100, verbose_name="Категорія")
     difficulty = models.IntegerField(choices=DIFFICULTY_CHOICES, default=1, verbose_name="Складність")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='skills', null=True)
 
     description = models.TextField(blank=True, verbose_name="Опис (Markdown)")
     video_url = models.URLField(blank=True, null=True, verbose_name="Посилання на відео (YouTube)")
@@ -27,21 +28,15 @@ class Skill(models.Model):
     )
 
     def get_video_id(self):
-        """
-        Витягує ID відео за допомогою регулярних виразів.
-        Це найнадійніший спосіб.
-        """
         if not self.video_url:
             return None
 
-        # Цей вираз шукає 11 символів (цифри, букви, -, _),
-        # які йдуть після "v=", "embed/" або "youtu.be/"
         regex = r'(?:v=|/|embed/|youtu\.be/)([0-9A-Za-z_-]{11})'
 
         match = re.search(regex, self.video_url)
 
         if match:
-            return match.group(1)  # Повертає чистий ID
+            return match.group(1)
         return None
 
     def __str__(self):

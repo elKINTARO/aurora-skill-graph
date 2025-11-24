@@ -2,6 +2,24 @@
 
 {% block content %}
 
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Моя карта знань</h1>
+        <a href="{% url 'skill_create' %}" class="btn btn-success shadow-sm">
+            + Додати навичку
+        </a>
+    </div>
+
+    {% if not skills %}
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <span style="font-size: 3rem;">🌱</span>
+            </div>
+            <h3>Ваш список порожній</h3>
+            <p class="text-muted">Почніть свій шлях розвитку просто зараз!</p>
+            <a href="{% url 'skill_create' %}" class="btn btn-primary mt-2">Створити першу навичку</a>
+        </div>
+    {% endif %}
+
     {% regroup skills by category as category_list %}
 
     {% for category in category_list %}
