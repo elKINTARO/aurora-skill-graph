@@ -12,4 +12,5 @@ urlpatterns = [
     path('skill/<slug:skill_slug>/delete/', views.skill_delete, name='skill_delete'),
     path('skill/<slug:skill_slug>/add-dependency/', views.skill_add_dependency, name='add_dependency'),
     path('skill/<slug:skill_slug>/remove-dependency/<int:dependency_id>/', views.skill_remove_dependency, name='remove_dependency'),
+    path('leaderboard/', views.leaderboard, name='leaderboard'),
 ]

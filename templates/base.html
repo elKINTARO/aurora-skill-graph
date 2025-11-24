@@ -15,6 +15,9 @@
         <div class="d-flex align-items-center">
             {% if user.is_authenticated %}
                 <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">👤 Профіль</a>
+                <a href="{% url 'leaderboard' %}" class="btn btn-outline-warning btn-sm me-2">
+                    🏆 Рейтинг
+                </a>
                 <form action="{% url 'logout' %}" method="post" class="d-inline">
                     {% csrf_token %}
                     <button class="btn btn-sm btn-outline-secondary">Вихід</button>

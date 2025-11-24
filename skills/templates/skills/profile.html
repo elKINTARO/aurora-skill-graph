@@ -11,55 +11,110 @@
     </div>
 
     <div class="row mb-5">
-        <div class="col-md-6">
-            <div class="card text-white bg-primary mb-3 shadow">
+
+        <div class="col-12 mb-4">
+            <div class="card shadow border-primary">
                 <div class="card-body">
-                    <h5 class="card-title">⚡ Загальний досвід (XP)</h5>
-                    <p class="display-4 fw-bold">{{ total_xp }}</p>
-                    <p class="card-text"><small>Бали нараховуються за складність завдань.</small></p>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-bold">Поточне звання</span>
+                            <h2 class="card-title text-primary mb-0 fw-bold">{{ rank.current_rank }}</h2>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small">Наступне звання</span>
+                            <div class="fw-bold">{{ rank.next_rank }}</div>
+                        </div>
+                    </div>
+
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                             role="progressbar"
+                             style="width:{{ rank.progress_percent }}%;"
+                             aria-valuenow="{{ rank.progress_percent }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                             {{ rank.progress_percent }}%
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-2">
+                        <small class="text-muted">
+                            {% if rank.xp_needed > 0 %}
+                                Ще <strong>{{ rank.xp_needed }} XP</strong> до підвищення 🚀
+                            {% else %}
+                                Ви досягли вершини! 👑
+                            {% endif %}
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="card text-white bg-primary shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <h5 class="card-title opacity-75">⚡ Загальний досвід (XP)</h5>
+                    <p class="display-4 fw-bold mb-0">{{ total_xp }}</p>
+                    <small class="opacity-75 mt-2">Бали за складність завдань</small>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-6">
-            <div class="card text-white bg-success mb-3 shadow">
-                <div class="card-body">
-                    <h5 class="card-title">📚 Вивчено навичок</h5>
-                    <p class="display-4 fw-bold">{{ finished_count }}</p>
-                    <p class="card-text"><small>Keep going!</small></p>
+            <div class="card text-white bg-success shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <h5 class="card-title opacity-75">📚 Вивчено навичок</h5>
+                    <p class="display-4 fw-bold mb-0">{{ finished_count }}</p>
+                    <small class="opacity-75 mt-2">Так тримати!</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <h3 class="border-bottom pb-2 mb-3">🔥 Зараз в роботі</h3>
+    <h3 class="border-bottom pb-2 mb-4 d-flex align-items-center">
+        🔥 Зараз в роботі
+        <span class="badge bg-secondary ms-2 fs-6 rounded-pill">{{ in_progress.count }}</span>
+    </h3>
 
     <div class="row">
         {% for item in in_progress %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 status-border-in_progress shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 status-border-in_progress shadow-sm hover-shadow transition">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-light text-dark border">{{ item.skill.get_difficulty_display }}</span>
+                            <small class="text-muted">{{ item.skill.category }}</small>
+                        </div>
+
+                        <h5 class="card-title fw-bold mb-3">
                             <a href="{% url 'skill_detail' item.skill.slug %}" class="text-decoration-none text-dark stretched-link">
                                 {{ item.skill.title }}
                             </a>
                         </h5>
-                        <span class="badge bg-light text-dark border mb-2">{{ item.skill.get_difficulty_display }}</span>
-                        <p class="card-text small text-muted">{{ item.skill.category }}</p>
-                    </div>
-                    <div class="card-footer bg-white border-top-0">
-                        <div class="progress" style="height: 5px;">
-                          <div class="progress-bar bg-warning" role="progressbar" style="width: 50%"></div>
+
+                        <div class="mt-auto">
+                            <div class="progress" style="height: 6px;">
+                              <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-muted">Статус:</small>
+                                <small class="fw-bold text-warning">В процесі...</small>
+                            </div>
                         </div>
-                        <small class="text-muted">В процесі...</small>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">
-                    Ви поки нічого не вчите. <a href="{% url 'skill_list' %}">Оберіть нову ціль!</a>
+                <div class="alert alert-info d-flex align-items-center shadow-sm">
+                    <span class="fs-2 me-3">💤</span>
+                    <div>
+                        <h5 class="alert-heading mb-1">Ви зараз нічого не вчите</h5>
+                        <p class="mb-0">Саме час обрати нову ціль! <a href="{% url 'skill_list' %}" class="alert-link">Перейти до списку навичок</a>.</p>
+                    </div>
                 </div>
             </div>
         {% endfor %}
     </div>
+
 {% endblock %}

@@ -8,29 +8,30 @@ from .models import Skill, UserSkillProgress, SkillDependency
 from django.views.decorators.cache import never_cache
 from django.utils.text import slugify
 from .forms import SkillForm, DependencyForm
-
-
+from .gamification import get_rank_info
+from django.contrib.auth.models import User
+from django.db.models import Case, When, IntegerField
 
 @login_required
 def user_profile(request):
     user_progress = UserSkillProgress.objects.filter(user=request.user).select_related('skill')
     in_progress_skills = user_progress.filter(status='in_progress')
     finished_skills = user_progress.filter(status='done')
+
     total_xp = finished_skills.aggregate(
         total_points=Sum(F('skill__difficulty') * 10)
     )['total_points'] or 0
+
+    rank_data = get_rank_info(total_xp)
 
     context = {
         'in_progress': in_progress_skills,
         'finished_count': finished_skills.count(),
         'total_xp': total_xp,
+        'rank': rank_data,
     }
 
     return render(request, 'skills/profile.html', context)
-
-
-from django.db.models import Q  # <--- Додай цей імпорт зверху
-
 
 @never_cache
 @login_required
@@ -249,3 +250,27 @@ def skill_remove_dependency(request, skill_slug, dependency_id):
         dependency.delete()
 
     return redirect('skill_detail', skill_slug=current_skill.slug)
+
+@login_required
+def leaderboard(request):
+    users = User.objects.annotate(
+        total_xp=Sum(
+            Case(
+                When(skill_progress__status='done', then=F('skill_progress__skill__difficulty') * 10),
+                default=0,
+                output_field=IntegerField()
+            )
+        )
+    ).order_by('-total_xp')
+
+    leaderboard_data = []
+    for user in users:
+        xp = user.total_xp or 0
+        rank_info = get_rank_info(xp)
+        leaderboard_data.append({
+            'user': user,
+            'xp': xp,
+            'rank': rank_info['current_rank']
+        })
+
+    return render(request, 'skills/leaderboard.html', {'leaders': leaderboard_data})
