@@ -1,26 +1,13 @@
-{% load static %}
-{% load markdown_extras %} <!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ skill.title }} | Aurora</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
+{% load markdown_extras %}
 
-<nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
-  <div class="container">
-    <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
-    <div class="d-flex">
-        <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">👤 Профіль</a>
-        <a href="{% url 'skill_list' %}" class="btn btn-primary btn-sm">← До списку</a>
+{% block title %}{{ skill.title }} | Aurora{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+        <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary btn-sm">← Повернутися до списку</a>
     </div>
-  </div>
-</nav>
 
-<div class="container">
     <div class="row">
 
         <div class="col-lg-8">
@@ -65,8 +52,7 @@
 
         <div class="col-lg-4">
 
-            <div class="card shadow-sm mb-4 sticky-top" style="top: 20px; z-index: 1;">
-                <div class="card-header bg-white fw-bold border-bottom">
+            <div class="card shadow-sm mb-4 sticky-top" style="top: 80px; z-index: 1;"> <div class="card-header bg-white fw-bold border-bottom">
                     Ваш прогрес
                 </div>
                 <div class="card-body text-center">
@@ -122,9 +108,9 @@
                                     {{ req.from_skill.title }}
                                 </a>
                                 {% if req.dependency_type == 'hard' %}
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Обов'язково</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Required</span>
                                 {% else %}
-                                    <span class="badge bg-light text-dark border">Бажано</span>
+                                    <span class="badge bg-light text-dark border">Soft</span>
                                 {% endif %}
                             </li>
                         {% endfor %}
@@ -145,7 +131,4 @@
 
         </div>
     </div>
-</div>
-
-</body>
-</html>
+{% endblock %}
