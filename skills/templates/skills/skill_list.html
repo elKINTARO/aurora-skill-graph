@@ -1,35 +1,6 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora SkillGraph</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %} {% block title %}Всі навички | Aurora{% endblock %}
 
-<nav class="navbar navbar-dark bg-dark mb-4 sticky-top shadow-sm">
-  <div class="container">
-    <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
-    <div class="d-flex align-items-center">
-        {% if user.is_authenticated %}
-            <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">
-                👤 Профіль
-            </a>
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <button class="btn btn-outline-secondary btn-sm text-white">Вихід</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Вхід</a>
-        {% endif %}
-    </div>
-  </div>
-</nav>
-
-<div class="container">
+{% block content %}
 
     {% regroup skills by category as category_list %}
 
@@ -50,14 +21,12 @@
                         {% else %}status-border-todo{% endif %}">
 
                         <div class="card-body d-flex flex-column">
-
                             <span class="badge rounded-pill bg-light text-dark border difficulty-badge">
                                 {{ skill.get_difficulty_display }}
                             </span>
 
                             <h5 class="card-title fw-bold pe-4">
                                 {% if skill.is_locked %}🔒{% endif %}
-
                                 <a href="{% url 'skill_detail' skill.slug %}" class="text-decoration-none text-dark stretched-link">
                                     {{ skill.title }}
                                 </a>
@@ -94,7 +63,7 @@
                                 {% endif %}
                             </div>
 
-                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center position-relative" style="z-index: 2;">
                                 <span class="small fw-bold text-muted">
                                     {% if skill.my_status == 'done' %}✅ Вивчено
                                     {% elif skill.my_status == 'in_progress' %}⏳ В процесі
@@ -108,7 +77,7 @@
                                     {% elif skill.my_status == 'in_progress' %}
                                         <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-success btn-action">Завершити</a>
                                     {% elif skill.my_status == 'done' %}
-                                        <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-outline-secondary btn-action" title="Скинути прогрес">↺</a>
+                                        <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-outline-secondary btn-action" title="Скинути">↺</a>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -125,7 +94,4 @@
         </div>
     {% endfor %}
 
-</div>
-
-</body>
-</html>
+{% endblock %}
