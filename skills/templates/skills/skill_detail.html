@@ -61,7 +61,24 @@
 
         <div class="col-lg-4">
 
-            <div class="card shadow-sm mb-4 sticky-top" style="top: 80px; z-index: 1;"> <div class="card-header bg-white fw-bold border-bottom">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold border-bottom">
+                    🕸️ Візуалізація
+                </div>
+                <div class="card-body text-center bg-light p-2">
+                    <pre class="mermaid" style="background: none; margin: 0;">
+                        {{ mermaid_graph|safe }}
+                    </pre>
+                    <small class="text-muted d-block mt-2 border-top pt-2">
+                        <span class="badge bg-success opacity-50">Вивчено</span>
+                        <span class="badge bg-warning text-dark opacity-50">В процесі</span>
+                        <span class="badge bg-primary">Ви тут</span>
+                    </small>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4 sticky-top" style="top: 80px; z-index: 1;">
+                <div class="card-header bg-white fw-bold border-bottom">
                     Ваш прогрес
                 </div>
                 <div class="card-body text-center">
