@@ -7,7 +7,9 @@
     <div class="col-md-8">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">✨ Додати нову ціль</h4>
+                <h4 class="mb-0">
+                    {% if is_edit %}✏️ Редагувати навичку{% else %}✨ Додати нову ціль{% endif %}
+                </h4>
             </div>
             <div class="card-body">
                 <form method="post">
@@ -25,7 +27,9 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a href="{% url 'skill_list' %}" class="btn btn-secondary">Скасувати</a>
-                        <button type="submit" class="btn btn-success">Зберегти навичку</button>
+                        <button type="submit" class="btn btn-success">
+                            {% if is_edit %}Зберегти зміни{% else %}Створити навичку{% endif %}
+                        </button>
                     </div>
                 </form>
             </div>

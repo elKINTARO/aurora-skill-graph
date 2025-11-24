@@ -4,8 +4,17 @@
 {% block title %}{{ skill.title }} | Aurora{% endblock %}
 
 {% block content %}
-    <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary btn-sm">← Повернутися до списку</a>
+
+        <div class="btn-group">
+            <a href="{% url 'skill_edit' skill.slug %}" class="btn btn-outline-primary btn-sm">
+                ✏️ Редагувати
+            </a>
+            <a href="{% url 'skill_delete' skill.slug %}" class="btn btn-outline-danger btn-sm">
+                🗑️ Видалити
+            </a>
+        </div>
     </div>
 
     <div class="row">

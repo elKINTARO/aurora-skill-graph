@@ -137,3 +137,31 @@ def skill_create(request):
         form = SkillForm()
 
     return render(request, 'skills/skill_form.html', {'form': form})
+
+
+@login_required
+def skill_edit(request, skill_slug):
+    skill = get_object_or_404(Skill, slug=skill_slug, author=request.user)
+    if request.method == 'POST':
+        form = SkillForm(request.POST, instance=skill)
+        if form.is_valid():
+            form.save()
+            return redirect('skill_detail', skill_slug=skill.slug)
+    else:
+        form = SkillForm(instance=skill)
+
+    return render(request, 'skills/skill_form.html', {
+        'form': form,
+        'is_edit': True,
+        'skill': skill
+    })
+
+@login_required
+def skill_delete(request, skill_slug):
+    skill = get_object_or_404(Skill, slug=skill_slug, author=request.user)
+
+    if request.method == 'POST':
+        skill.delete()
+        return redirect('skill_list')
+
+    return render(request, 'skills/skill_confirm_delete.html', {'skill': skill})
