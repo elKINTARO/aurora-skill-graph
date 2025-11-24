@@ -54,3 +54,28 @@ def change_status(request, skill_slug, new_status):
     progress.save()
 
     return redirect('skill_list')
+
+def skill_detail(request, skill_slug):
+    skill = get_object_or_404(Skill, slug=skill_slug)
+    if request.user.is_authenticated:
+        try:
+            progress = UserSkillProgress.objects.get(user=request.user, skill=skill)
+            skill.my_status = progress.status
+        except UserSkillProgress.DoesNotExist:
+            skill.my_status = 'todo'
+
+        if skill.my_status == 'todo':
+            skill.is_locked = False
+            for req in skill.requires.all():
+                if req.dependency_type == 'hard':
+                    is_parent_done = UserSkillProgress.objects.filter(
+                        user=request.user,
+                        skill=req.from_skill,
+                        status='done'
+                    ).exists()
+
+                    if not is_parent_done:
+                        skill.is_locked = True
+                        break
+
+    return render(request, 'skills/skill_detail.html', {'skill': skill})

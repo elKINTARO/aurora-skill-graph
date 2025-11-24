@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ skill.title }} | Aurora</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
+    <a href="{% url 'skill_list' %}" class="btn btn-outline-light btn-sm">← На головну</a>
+  </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <span class="badge bg-secondary mb-2">{{ skill.get_difficulty_display }}</span>
+                    <h1 class="mb-3 text-primary">{{ skill.title }}</h1>
+                    <p class="text-muted mb-4">Категорія: {{ skill.category }}</p>
+
+                    <hr>
+
+                    <div class="content-area py-3">
+                        {% if skill.description %}
+                            {{ skill.description|linebreaks }}
+                        {% else %}
+                            <p class="text-muted fst-italic">Опис для цієї навички ще не додано.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold">
+                    Ваш прогрес
+                </div>
+                <div class="card-body text-center">
+                    {% if user.is_authenticated %}
+
+                        <div class="mb-3">
+                            {% if skill.my_status == 'done' %}
+                                <h4 class="text-success">✅ Вивчено</h4>
+                            {% elif skill.my_status == 'in_progress' %}
+                                <h4 class="text-warning">⏳ В процесі</h4>
+                            {% elif skill.is_locked %}
+                                <h4 class="text-secondary">🔒 Заблоковано</h4>
+                                <small class="text-danger d-block">Вивчіть попередні теми!</small>
+                            {% else %}
+                                <h4 class="text-muted">⚪ Ще не вивчено</h4>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {% if skill.my_status == 'todo' and not skill.is_locked %}
+                                <a href="{% url 'change_status' skill.slug 'in_progress' %}" class="btn btn-primary btn-lg">Почати навчання</a>
+                            {% elif skill.my_status == 'in_progress' %}
+                                <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-success btn-lg">Завершити ✅</a>
+                            {% elif skill.my_status == 'done' %}
+                                <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-outline-secondary">Скинути прогрес</a>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <p>Увійдіть, щоб трекати прогрес</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Вхід</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">
+                    Зв'язки
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% if skill.requires.all %}
+                        <li class="list-group-item bg-light"><strong>Вимоги:</strong></li>
+                        {% for req in skill.requires.all %}
+                            <li class="list-group-item">
+                                <a href="{% url 'skill_detail' req.from_skill.slug %}" class="text-decoration-none">
+                                    {{ req.from_skill.title }}
+                                </a>
+                                {% if req.dependency_type == 'hard' %}<span class="text-danger">*</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if skill.required_by.all %}
+                        <li class="list-group-item bg-light"><strong>Відкриває:</strong></li>
+                        {% for req in skill.required_by.all %}
+                            <li class="list-group-item">
+                                <a href="{% url 'skill_detail' req.to_skill.slug %}" class="text-decoration-none">
+                                    {{ req.to_skill.title }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

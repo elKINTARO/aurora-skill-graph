@@ -54,7 +54,11 @@
                             </span>
 
                             <h5 class="card-title fw-bold pe-4">
-                                {% if skill.is_locked %}🔒{% endif %} {{ skill.title }}
+                                {% if skill.is_locked %}🔒{% endif %}
+
+                                <a href="{% url 'skill_detail' skill.slug %}" class="text-decoration-none text-dark stretched-link">
+                                    {{ skill.title }}
+                                </a>
                             </h5>
 
                             <div class="mb-3 small">
