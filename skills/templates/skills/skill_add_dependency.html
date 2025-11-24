@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Додати вимогу | Aurora{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🔗 Зв'язати навички</h5>
+            </div>
+            <div class="card-body p-4">
+                <p>Що треба вивчити перед <strong>{{ skill.title }}</strong>?</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="alert alert-info small">
+                        У списку відображаються тільки ваші навички.
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'skill_detail' skill.slug %}" class="btn btn-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-primary">Створити зв'язок</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

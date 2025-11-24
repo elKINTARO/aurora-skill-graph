@@ -3,10 +3,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Sum, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Skill, UserSkillProgress
+from .models import Skill, UserSkillProgress, SkillDependency
 from django.views.decorators.cache import never_cache
 from django.utils.text import slugify
-from .forms import SkillForm
+from .forms import SkillForm, DependencyForm
+
 
 
 @login_required
@@ -165,3 +166,35 @@ def skill_delete(request, skill_slug):
         return redirect('skill_list')
 
     return render(request, 'skills/skill_confirm_delete.html', {'skill': skill})
+
+
+@login_required
+def skill_add_dependency(request, skill_slug):
+    current_skill = get_object_or_404(Skill, slug=skill_slug, author=request.user)
+
+    if request.method == 'POST':
+        form = DependencyForm(request.user, current_skill, request.POST)
+        if form.is_valid():
+            dependency = form.save(commit=False)
+            dependency.to_skill = current_skill
+            dependency.save()
+            return redirect('skill_detail', skill_slug=current_skill.slug)
+    else:
+        form = DependencyForm(request.user, current_skill)
+
+    return render(request, 'skills/skill_add_dependency.html', {
+        'form': form,
+        'skill': current_skill
+    })
+
+
+@login_required
+def skill_remove_dependency(request, skill_slug, dependency_id):
+    current_skill = get_object_or_404(Skill, slug=skill_slug, author=request.user)
+
+    dependency = get_object_or_404(SkillDependency, id=dependency_id, to_skill=current_skill)
+
+    if request.method == 'POST':
+        dependency.delete()
+
+    return redirect('skill_detail', skill_slug=current_skill.slug)
