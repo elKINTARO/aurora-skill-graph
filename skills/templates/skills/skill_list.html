@@ -11,10 +11,41 @@
         </a>
     </div>
 
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        </div>
+
+    <ul class="nav nav-pills mb-4 gap-2">
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'all' %}active{% endif %}"
+               href="?status=all{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}">
+               📚 Всі
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'in_progress' %}active{% endif %}"
+               href="?status=in_progress{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}">
+               🔥 Активні
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'todo' %}active{% endif %}"
+               href="?status=todo{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}">
+               ⚪ Не початі
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'done' %}active{% endif %}"
+               href="?status=done{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}">
+               ✅ Закінчені
+            </a>
+        </li>
+    </ul>
+
     <div class="card shadow-sm mb-5 border-0 bg-white">
         <div class="card-body p-3">
             <form method="get" class="row g-2 align-items-center">
 
+                <input type="hidden" name="status" value="{{ status_filter }}">
                 <div class="col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0">🔍</span>
@@ -66,9 +97,21 @@
 
     {% for category in category_list %}
         <div class="mb-5">
-            <h3 class="border-bottom pb-2 mb-3 text-primary">
-                📂 {{ category.grouper }}
-            </h3>
+
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                <h3 class="text-primary mb-0">
+                    📂 {{ category.grouper }}
+                </h3>
+
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteCategoryModal"
+                        data-delete-url="{% url 'category_delete' category.grouper %}"
+                        data-category-name="{{ category.grouper }}">
+                    🗑️ Видалити групу
+                </button>
+            </div>
 
             <div class="row">
                 {% for skill in category.list %}
@@ -149,5 +192,50 @@
             </div>
         </div>
     {% endfor %}
+
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">⚠️ Підтвердження видалення</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>Ви впевнені, що хочете видалити категорію <strong id="modalCategoryName"></strong>?</p>
+        <p class="text-danger small mb-0">
+            Будуть видалені <strong>ВСІ</strong> навички в цій категорії. Цю дію неможливо скасувати!
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+
+        <form id="deleteCategoryForm" method="post" action="">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Так, видалити все</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+    var deleteModal = document.getElementById('deleteCategoryModal')
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget
+
+        var url = button.getAttribute('data-delete-url')
+        var name = button.getAttribute('data-category-name')
+
+        var modalForm = deleteModal.querySelector('#deleteCategoryForm')
+        var modalName = deleteModal.querySelector('#modalCategoryName')
+
+        modalForm.action = url
+        modalName.textContent = '"' + name + '"'
+    })
+</script>
 
 {% endblock %}

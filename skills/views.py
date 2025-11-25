@@ -38,6 +38,7 @@ def user_profile(request):
 
     return render(request, 'skills/profile.html', context)
 
+
 @never_cache
 def skill_list(request):
     if not request.user.is_authenticated:
@@ -47,18 +48,16 @@ def skill_list(request):
         'requires__from_skill',
         'required_by__to_skill'
     ).order_by('category', 'difficulty', 'title')
-
     categories = Skill.objects.filter(author=request.user).values_list('category', flat=True).distinct()
-
     search_query = request.GET.get('search', '')
     category_filter = request.GET.get('category', '')
+    status_filter = request.GET.get('status', 'all')
 
     if search_query:
         skills = skills.filter(
             Q(title__icontains=search_query) |
             Q(description__icontains=search_query)
         )
-
     if category_filter:
         skills = skills.filter(category=category_filter)
 
@@ -66,9 +65,12 @@ def skill_list(request):
     user_progress_map = {p.skill_id: p.status for p in user_progress_qs}
     completed_ids = {p.skill_id for p in user_progress_qs if p.status == 'done'}
 
+    final_skills = []
+
     for skill in skills:
         skill.my_status = user_progress_map.get(skill.id, 'todo')
         skill.is_locked = False
+
         for req in skill.requires.all():
             if req.dependency_type == 'hard':
                 if req.from_skill.id in completed_ids:
@@ -77,11 +79,17 @@ def skill_list(request):
                     req.is_met = False
                     skill.is_locked = True
 
+        if status_filter == 'all':
+            final_skills.append(skill)
+        elif status_filter == skill.my_status:
+            final_skills.append(skill)
+
     context = {
-        'skills': skills,
+        'skills': final_skills,
         'categories': categories,
         'search_query': search_query,
         'category_filter': category_filter,
+        'status_filter': status_filter,
     }
 
     return render(request, 'skills/skill_list.html', context)
@@ -365,3 +373,16 @@ def ai_generator(request):
             return render(request, 'skills/ai_generator.html', {'error': error})
 
     return render(request, 'skills/ai_generator.html')
+
+@login_required
+def category_delete(request, category_name):
+    skills_to_delete = Skill.objects.filter(
+        author=request.user,
+        category=category_name
+    )
+
+    if request.method == 'POST':
+        deleted_count = skills_to_delete.count()
+        skills_to_delete.delete()
+        return redirect('skill_list')
+    return redirect('skill_list')
