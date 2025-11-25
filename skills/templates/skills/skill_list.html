@@ -4,15 +4,10 @@
 
 {% block content %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Моя карта знань</h1>
-        <a href="{% url 'skill_create' %}" class="btn btn-success shadow-sm">
-            + Нова навичка
-        </a>
+    <div class="mb-4">
+        <h1 class="h3 mb-1 fw-bold">Моя карта знань</h1>
+        <p class="text-muted small mb-0">Керуйте своїм прогресом та планами</p>
     </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        </div>
 
     <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
@@ -41,55 +36,53 @@
         </li>
     </ul>
 
-    <div class="card shadow-sm mb-5 border-0 bg-white">
-        <div class="card-body p-3">
-            <form method="get" class="row g-2 align-items-center">
+    <div class="mb-5">
+        <form method="get" class="d-flex gap-3">
+            <input type="hidden" name="status" value="{{ status_filter }}">
 
-                <input type="hidden" name="status" value="{{ status_filter }}">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0">🔍</span>
-                        <input type="text" name="search" class="form-control border-start-0 ps-0"
-                               placeholder="Пошук навички..."
-                               value="{{ search_query }}"> </div>
-                </div>
+            <div class="search-bar-container flex-grow-1">
+                <i class="bi bi-search text-muted me-2"></i>
 
-                <div class="col-md-4">
-                    <select name="category" class="form-select" onchange="this.form.submit()">
-                        <option value="">-- Всі категорії --</option>
-                        {% for cat in categories %}
-                            <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
-                                {{ cat }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search skills..."
+                       value="{{ search_query }}">
 
-                <div class="col-md-2 d-grid">
-                    <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary">
-                        Скинути
-                    </a>
-                </div>
+                <select name="category" class="form-select ms-2 ps-3" style="width: auto; max-width: 250px;" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
+                            {{ cat }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                <button type="submit" hidden></button>
-            </form>
-        </div>
+            <a href="{% url 'skill_list' %}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+               style="width: 50px; height: 50px; border-radius: 50%; padding: 0;"
+               title="Скинути фільтри">
+                <i class="bi bi-arrow-counterclockwise fs-5"></i>
+            </a>
+
+            <button type="submit" hidden></button>
+        </form>
     </div>
 
     {% if not skills and search_query %}
         <div class="text-center py-5">
-            <h4 class="text-muted">За запитом "{{ search_query }}" нічого не знайдено 🤷‍♂️</h4>
-            <a href="{% url 'skill_list' %}" class="btn btn-link">Показати всі навички</a>
+            <div class="mb-3 opacity-50" style="font-size: 4rem;">🔍</div>
+            <h4 class="text-muted">Нічого не знайдено</h4>
+            <p class="text-muted small">Спробуйте змінити запит або категорію</p>
+            <a href="{% url 'skill_list' %}" class="btn btn-outline-primary btn-sm mt-2">Очистити пошук</a>
         </div>
 
     {% elif not skills and not search_query %}
         <div class="text-center py-5">
-            <div class="mb-3">
-                <span style="font-size: 3rem;">🌱</span>
-            </div>
+            <div class="mb-3" style="font-size: 4rem;">🌱</div>
             <h3>Ваш список порожній</h3>
             <p class="text-muted">Почніть свій шлях розвитку просто зараз!</p>
             <a href="{% url 'skill_create' %}" class="btn btn-primary mt-2">Створити першу навичку</a>
+            <span class="mx-2 text-muted">або</span>
+            <a href="{% url 'ai_generator' %}" class="btn btn-outline-info mt-2">Попросити AI</a>
         </div>
     {% endif %}
 
@@ -98,39 +91,41 @@
     {% for category in category_list %}
         <div class="mb-5">
 
-            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                <h3 class="text-primary mb-0">
-                    📂 {{ category.grouper }}
+            <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-3">
+                <h3 class="h5 mb-0 text-info fw-bold">
+                    <i class="bi bi-folder2-open me-2"></i> {{ category.grouper }}
                 </h3>
 
                 <button type="button"
-                        class="btn btn-outline-danger btn-sm"
+                        class="btn btn-outline-danger btn-sm border-0"
                         data-bs-toggle="modal"
                         data-bs-target="#deleteCategoryModal"
                         data-delete-url="{% url 'category_delete' category.grouper %}"
                         data-category-name="{{ category.grouper }}">
-                    🗑️ Видалити групу
+                    <i class="bi bi-trash3"></i>
                 </button>
             </div>
 
-            <div class="row">
+            <div class="row g-4">
                 {% for skill in category.list %}
-                <div class="col-md-6 col-lg-4 mb-4">
+                <div class="col-md-6 col-lg-4">
 
-                    <div class="card shadow-sm h-100 position-relative
-                        {% if skill.is_locked %}card-locked status-border-locked
+                    <div class="card h-100 position-relative
+                        {% if skill.is_locked %}card-locked status-border-todo
                         {% elif skill.my_status == 'done' %}status-border-done
                         {% elif skill.my_status == 'in_progress' %}status-border-in_progress
                         {% else %}status-border-todo{% endif %}">
 
                         <div class="card-body d-flex flex-column">
-                            <span class="badge rounded-pill bg-light text-dark border difficulty-badge">
-                                {{ skill.get_difficulty_display }}
-                            </span>
+                            <div class="position-absolute top-0 end-0 mt-3 me-3">
+                                <span class="badge bg-light text-dark rounded-pill border border-secondary">
+                                    {{ skill.get_difficulty_display }}
+                                </span>
+                            </div>
 
-                            <h5 class="card-title fw-bold pe-4">
+                            <h5 class="card-title fw-bold pe-5 mb-3">
                                 {% if skill.is_locked %}🔒{% endif %}
-                                <a href="{% url 'skill_detail' skill.slug %}" class="text-decoration-none text-dark stretched-link">
+                                <a href="{% url 'skill_detail' skill.slug %}" class="text-decoration-none stretched-link">
                                     {{ skill.title }}
                                 </a>
                             </h5>
@@ -138,15 +133,17 @@
                             <div class="mb-3 small">
                                 {% if skill.requires.all %}
                                     <div class="mb-1">
-                                        <strong>Вимоги:</strong>
-                                        <ul class="requirements-list">
+                                        <strong class="text-muted">Вимоги:</strong>
+                                        <ul class="list-unstyled mb-0 ps-2">
                                         {% for req in skill.requires.all %}
                                             <li>
                                                 {% if req.is_met %}
-                                                    <span class="text-success fw-bold">✔ {{ req.from_skill.title }}</span>
+                                                    <span class="text-success">
+                                                        <i class="bi bi-check-circle-fill"></i> {{ req.from_skill.title }}
+                                                    </span>
                                                 {% else %}
                                                     <span class="text-danger">
-                                                        ✘ {{ req.from_skill.title }}
+                                                        <i class="bi bi-x-circle"></i> {{ req.from_skill.title }}
                                                         {% if req.dependency_type == 'hard' %}*{% endif %}
                                                     </span>
                                                 {% endif %}
@@ -158,7 +155,7 @@
 
                                 {% if skill.required_by.all %}
                                     <div class="text-muted mt-2">
-                                        <strong>Відкриє:</strong>
+                                        <strong><i class="bi bi-unlock"></i> Відкриє:</strong>
                                         {% for req in skill.required_by.all %}
                                             {{ req.to_skill.title }}{% if not forloop.last %}, {% endif %}
                                         {% endfor %}
@@ -166,21 +163,28 @@
                                 {% endif %}
                             </div>
 
-                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center position-relative" style="z-index: 2;">
-                                <span class="small fw-bold text-muted">
-                                    {% if skill.my_status == 'done' %}✅ Вивчено
-                                    {% elif skill.my_status == 'in_progress' %}⏳ В процесі
-                                    {% elif skill.is_locked %}⛔ Недоступно
-                                    {% else %}⚪ Треба вивчити{% endif %}
+                            <div class="mt-auto pt-3 border-top border-secondary d-flex justify-content-between align-items-center position-relative" style="z-index: 2;">
+                                <span class="small fw-bold">
+                                    {% if skill.my_status == 'done' %}
+                                        <span class="text-success"><i class="bi bi-check-lg"></i> Вивчено</span>
+                                    {% elif skill.my_status == 'in_progress' %}
+                                        <span class="text-warning"><i class="bi bi-hourglass-split"></i> Вчу...</span>
+                                    {% elif skill.is_locked %}
+                                        <span class="text-muted"><i class="bi bi-lock-fill"></i> Закрито</span>
+                                    {% else %}
+                                        <span class="text-muted">⚪ Треба вивчити</span>
+                                    {% endif %}
                                 </span>
 
                                 {% if user.is_authenticated %}
                                     {% if skill.my_status == 'todo' and not skill.is_locked %}
-                                        <a href="{% url 'change_status' skill.slug 'in_progress' %}" class="btn btn-primary btn-action">Почати</a>
+                                        <a href="{% url 'change_status' skill.slug 'in_progress' %}" class="btn btn-sm btn-primary rounded-pill px-3">Почати</a>
                                     {% elif skill.my_status == 'in_progress' %}
-                                        <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-success btn-action">Завершити</a>
+                                        <a href="{% url 'change_status' skill.slug 'done' %}" class="btn btn-sm btn-success rounded-pill px-3">Завершити</a>
                                     {% elif skill.my_status == 'done' %}
-                                        <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-outline-secondary btn-action" title="Скинути">↺</a>
+                                        <a href="{% url 'change_status' skill.slug 'todo' %}" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Скинути">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </a>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -193,49 +197,47 @@
         </div>
     {% endfor %}
 
-<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border border-secondary text-white">
 
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">⚠️ Підтвердження видалення</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Видалення категорії</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <p>Ви збираєтесь видалити категорію: <strong id="modalCategoryName" class="text-info"></strong></p>
+            <p class="text-secondary small mb-0">
+                Це призведе до видалення <strong>ВСІХ</strong> карток у цій групі. Цю дію неможливо скасувати.
+            </p>
+          </div>
+
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button>
+            <form id="deleteCategoryForm" method="post" action="">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Видалити все</button>
+            </form>
+          </div>
+
+        </div>
       </div>
-
-      <div class="modal-body">
-        <p>Ви впевнені, що хочете видалити категорію <strong id="modalCategoryName"></strong>?</p>
-        <p class="text-danger small mb-0">
-            Будуть видалені <strong>ВСІ</strong> навички в цій категорії. Цю дію неможливо скасувати!
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-
-        <form id="deleteCategoryForm" method="post" action="">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Так, видалити все</button>
-        </form>
-      </div>
-
     </div>
-  </div>
-</div>
 
-<script>
-    var deleteModal = document.getElementById('deleteCategoryModal')
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget
+    <script>
+        var deleteModal = document.getElementById('deleteCategoryModal')
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+            var url = button.getAttribute('data-delete-url')
+            var name = button.getAttribute('data-category-name')
 
-        var url = button.getAttribute('data-delete-url')
-        var name = button.getAttribute('data-category-name')
+            var modalForm = deleteModal.querySelector('#deleteCategoryForm')
+            var modalName = deleteModal.querySelector('#modalCategoryName')
 
-        var modalForm = deleteModal.querySelector('#deleteCategoryForm')
-        var modalName = deleteModal.querySelector('#modalCategoryName')
-
-        modalForm.action = url
-        modalName.textContent = '"' + name + '"'
-    })
-</script>
+            modalForm.action = url
+            modalName.textContent = name
+        })
+    </script>
 
 {% endblock %}

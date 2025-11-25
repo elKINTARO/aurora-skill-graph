@@ -94,9 +94,34 @@ class Profile(models.Model):
     avatar = models.ImageField(default='default.jpg', upload_to='profile_avatars', blank=True, verbose_name='Аватар')
     bio = models.TextField(max_length=500, blank=True, verbose_name='Про мене')
 
+    is_public = models.BooleanField(default=True, verbose_name="Показувати в рейтингу")
+    dark_mode = models.BooleanField(default=False, verbose_name="Темна тема")
+
     github_link = models.URLField(max_length=200, blank=True, verbose_name='GitHub')
     linkedin_link = models.URLField(max_length=200, blank=True, verbose_name='LinkedIn')
     website_link = models.URLField(max_length=200, blank=True, verbose_name='Вебсайт')
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+class Feedback(models.Model):
+    CATEGORY_CHOICES = [
+        ('bug', '🐛 Помилка / Баг'),
+        ('feature', '💡 Ідея / Пропозиція'),
+        ('other', '📝 Інше'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='feedbacks')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other', verbose_name="Категорія")
+    subject = models.CharField(max_length=200, verbose_name="Тема")
+    message = models.TextField(verbose_name="Повідомлення")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    is_resolved = models.BooleanField(default=False, verbose_name="Вирішено")
+
+    def __str__(self):
+        return f"[{self.get_category_display()}] {self.subject} ({self.user.username})"
+
+    class Meta:
+        verbose_name = "Зворотний зв'язок"
+        verbose_name_plural = "Зворотний зв'язок"
+        ordering = ['-created_at']

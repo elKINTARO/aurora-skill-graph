@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Skill, SkillDependency, UserSkillProgress
+from .models import Skill, SkillDependency, UserSkillProgress, Feedback
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
@@ -17,3 +17,11 @@ class SkillDependencyAdmin(admin.ModelAdmin):
 class UserSkillProgressAdmin(admin.ModelAdmin):
     list_display = ('user', 'skill', 'status')
     list_filter = ('status', 'user')
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('category', 'subject', 'user', 'created_at', 'is_resolved')
+    list_filter = ('is_resolved', 'category', 'created_at')
+    search_fields = ('subject', 'message', 'user__username')
+    readonly_fields = ('created_at',)
+    list_editable = ('is_resolved',)

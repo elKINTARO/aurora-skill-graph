@@ -1,40 +1,63 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Вхід | Aurora{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="col-md-5 col-lg-4">
-        <div class="card shadow">
-            <div class="card-body p-4">
-                <h3 class="text-center mb-4 text-primary">🔑 Вхід</h3>
+
+        <div class="text-center mb-4">
+            <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo"
+                 style="width: 100px; height: auto; margin-bottom: 1rem; filter: drop-shadow(0 0 15px rgba(156, 39, 176, 0.5));">
+            <h2 class="fw-bold mt-2 text-white">Aurora SkillGraph</h2>
+        </div>
+
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <h4 class="text-center mb-4 text-muted">З поверненням! 👋</h4>
 
                 <form method="post">
                     {% csrf_token %}
 
                     {% if form.errors %}
-                        <div class="alert alert-danger py-2 small">Невірне ім'я або пароль.</div>
+                        <div class="alert alert-danger py-2 small border-0 bg-danger bg-opacity-25 text-white">
+                            Невірний логін або пароль.
+                        </div>
                     {% endif %}
 
                     <div class="mb-3">
-                        <label class="form-label small text-muted">Логін</label>
-                        <input type="text" name="username" class="form-control" required autofocus>
+                        <label class="form-label small text-muted text-uppercase fw-bold">Логін</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="username" class="form-control" placeholder="Введіть логін" required autofocus>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">Пароль</label>
-                        <input type="password" name="password" class="form-control" required>
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Пароль</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Увійти</button>
+                    <button type="submit" class="btn btn-primary w-100 py-2 mb-3 shadow-lg">
+                        Увійти в систему
+                    </button>
                 </form>
 
-                <hr>
-                <div class="text-center small">
-                    Немає акаунту? <a href="{% url 'register' %}">Зареєструватися</a>
-                    </div>
+                <div class="text-center mt-3 border-top border-secondary pt-3">
+                    <span class="text-muted small">Немає акаунту?</span>
+                    <a href="{% url 'register' %}" class="fw-bold text-decoration-none text-info">Створити безкоштовно</a>
+                </div>
             </div>
         </div>
+
+        <div class="text-center mt-4 text-muted small">
+            &copy; 2025 Aurora Inc.
+        </div>
+
     </div>
 </div>
 {% endblock %}

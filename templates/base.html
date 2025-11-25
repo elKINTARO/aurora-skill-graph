@@ -1,69 +1,141 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="uk">
+{% load static %}
+<html lang="uk" data-bs-theme="{% if user.is_authenticated and user.profile.dark_mode %}dark{% else %}light{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Aurora SkillGraph{% endblock %}</title> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}Aurora SkillGraph{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    {% block extra_css %}{% endblock %} </head>
-<body class="bg-light d-flex flex-column min-vh-100"> <nav class="navbar navbar-dark bg-dark mb-4 shadow-sm sticky-top">
-      <div class="container">
-        <a class="navbar-brand" href="/">🌌 Aurora SkillGraph</a>
-
-        <div class="d-flex align-items-center">
-            {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">👤 Профіль</a>
-                <a href="{% url 'leaderboard' %}" class="btn btn-outline-warning btn-sm me-2">
-                    🏆 Рейтинг
-                </a>
-                <a href="{% url 'ai_generator' %}" class="btn btn-outline-primary btn-sm me-2">
-                    ✨ AI План
-                </a>
-                <form action="{% url 'logout' %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-secondary">Вихід</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Вхід</a>
-            {% endif %}
-        </div>
-      </div>
-    </nav>
-
-    <main class="container mb-5">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
-    </main>
-
-    <footer class="footer mt-auto py-3 bg-white border-top text-center text-muted small">
-        <div class="container">
-            <span>&copy; 2025 Aurora SkillGraph. Build your future.</span>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
             themeVariables: {
-                primaryColor: '#e3f2fd', // Світло-синій
-                edgeLabelBackground: '#ffffff',
-                tertiaryColor: '#f8f9fa'
-            }
+                'primaryColor': '#2b3035',
+                'primaryTextColor': '#e9ecef',
+                'primaryBorderColor': '#495057',
+                'lineColor': '#adb5bd',
+                'secondaryColor': '#ffc107',
+                'tertiaryColor': '#fff'
+            },
+            securityLevel: 'loose',
         });
     </script>
+</head>
+<body>
 
-    {% block extra_js %}{% endblock %}
+    <div class="layout-wrapper">
+
+        {% if user.is_authenticated %}
+        <aside class="sidebar">
+
+            <a href="{% url 'skill_list' %}" class="sidebar-brand text-decoration-none d-flex align-items-center px-2">
+                <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo"
+                     style="width: 55px; height: auto; margin-right: 12px; filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.4));">
+
+                <div class="d-flex flex-column justify-content-center" style="line-height: 1.2;">
+                    <span class="fw-bold fs-4" style="letter-spacing: 0.5px;">Aurora</span>
+                    <span class="fs-6 text-uppercase" style="letter-spacing: 2px; font-weight: 800;">SkillGraph</span>
+                </div>
+            </a>
+
+            <nav class="nav flex-column mb-auto mt-4">
+                <a href="{% url 'skill_list' %}" class="nav-link {% if request.resolver_match.url_name == 'skill_list' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2-fill"></i> Дашборд
+                </a>
+                <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                    <i class="bi bi-person-circle"></i> Мій Профіль
+                </a>
+                <a href="{% url 'leaderboard' %}" class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">
+                    <i class="bi bi-trophy-fill"></i> Рейтинг
+                </a>
+                <a href="{% url 'ai_generator' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_generator' %}active{% endif %}">
+                   <i class="bi bi-stars"></i> AI Генератор
+                </a>
+                 <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                   <i class="bi bi-gear-fill"></i> Налаштування
+                </a>
+            </nav>
+
+            <nav class="nav flex-column mt-4">
+                <a href="{% url 'feedback' %}" class="nav-link">
+                    <i class="bi bi-question-circle-fill"></i> Допомога
+                </a>
+                 <form action="{% url 'logout' %}" method="post" class="w-100">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent text-danger fw-bold" style="color: #ff6b6b !important;">
+                         <i class="bi bi-box-arrow-right"></i> Вихід
+                    </button>
+                </form>
+            </nav>
+        </aside>
+        {% endif %}
+
+
+        <main class="main-content {% if not user.is_authenticated %}ms-0{% endif %}">
+
+            {% if user.is_authenticated %}
+            <header class="top-bar">
+
+                <div class="d-flex align-items-center w-100 justify-content-end">
+
+                    <a href="{% url 'skill_create' %}" class="btn btn-sm me-4 text-white shadow-sm"
+                       style="background: var(--aurora-gradient-primary); border:none; border-radius: 8px; font-weight: 600; padding: 8px 16px;">
+                        + Нова навичка
+                    </a>
+
+                    <a href="{% url 'profile' %}" class="d-flex align-items-center text-decoration-none">
+
+                         <div class="position-relative shadow-sm rounded-circle" style="width: 40px; height: 40px;">
+
+                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white fw-bold border border-2 border-info rounded-circle"
+                                 style="font-size: 1.2rem; z-index: 1;">
+                                {{ user.username.0|upper }}
+                            </div>
+
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}"
+                                     alt=""
+                                     class="position-absolute top-0 start-0 w-100 h-100 rounded-circle border border-2 border-info"
+                                     style="object-fit: cover; z-index: 2;"
+                                     onerror="this.style.display='none'">
+                                     {% endif %}
+
+                         </div>
+
+                         <span class="ms-3 fw-bold text-white" style="font-size: 0.95rem;">{{ user.username }}</span>
+                    </a>
+                </div>
+            </header>
+            {% endif %}
+
+            <div class="content-container">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert"
+                             style="background-color: var(--bg-card); color: var(--text-main); border-left: 4px solid var(--aurora-accent-cyan);">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

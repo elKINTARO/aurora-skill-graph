@@ -1,7 +1,6 @@
 from django import forms
-from .models import Skill, SkillDependency
+from .models import Skill, SkillDependency, Profile, Feedback
 from django.contrib.auth.models import User
-from .models import Profile
 
 class SkillForm(forms.ModelForm):
     class Meta:
@@ -63,4 +62,23 @@ class ProfileUpdateForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'github_link': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://github.com/...'}),
             'linkedin_link': forms.URLInput(attrs={'class': 'form-control'}),
+        }
+
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['is_public', 'dark_mode']
+        widgets = {
+            'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+            'dark_mode': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+        }
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['category', 'subject', 'message']
+        widgets = {
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Коротко про суть...'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Опишіть детально вашу проблему або ідею...'}),
         }

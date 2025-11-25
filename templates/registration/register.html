@@ -1,66 +1,67 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Реєстрація | Aurora{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="col-md-6 col-lg-5">
-        <div class="card shadow border-0">
+
+        <div class="text-center mb-4">
+            <img src="{% static 'images/logo_graph.svg' %}" alt="Aurora Logo"
+                 style="width: 100px; height: auto; margin-bottom: 1rem; filter: drop-shadow(0 0 15px rgba(156, 39, 176, 0.5));">
+            <h2 class="fw-bold text-white">Створити акаунт 🚀</h2>
+            <p class="text-muted">Почніть будувати своє майбутнє вже сьогодні</p>
+        </div>
+
+        <div class="card shadow-lg border-0">
             <div class="card-body p-5">
-                <h3 class="text-center mb-4 text-primary">🚀 Приєднатися</h3>
-                <p class="text-center text-muted mb-4 small">Створіть акаунт, щоб відстежувати свій прогрес</p>
 
                 <form method="post">
                     {% csrf_token %}
 
                     {% if form.errors %}
-                        <div class="alert alert-danger py-2 small">
-                            <ul class="mb-0 ps-3">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                            </ul>
+                        <div class="alert alert-danger py-2 small border-0 bg-danger bg-opacity-25 text-white">
+                            Будь ласка, виправте помилки нижче.
                         </div>
                     {% endif %}
 
                     {% for field in form %}
                         <div class="mb-3">
-                            <label class="form-label small text-muted">{{ field.label }}</label>
-
-                            <div class="input-group">
-                                {{ field }}
-                            </div>
-
+                            <label class="form-label small text-muted text-uppercase fw-bold">{{ field.label }}</label>
+                            {{ field }}
                             {% if field.help_text %}
-                                <div class="form-text small" style="font-size: 0.75rem;">{{ field.help_text }}</div>
+                                <div class="form-text small text-muted opacity-50" style="font-size: 0.7rem;">{{ field.help_text }}</div>
                             {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
                         </div>
                     {% endfor %}
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Зареєструватися</button>
+                        <button type="submit" class="btn btn-success py-2 shadow-lg">
+                            Зареєструватися
+                        </button>
                     </div>
                 </form>
 
-                <hr class="my-4">
-
-                <div class="text-center small">
-                    Вже є акаунт? <a href="{% url 'login' %}" class="fw-bold text-decoration-none">Увійти</a>
+                <div class="text-center mt-4">
+                    <span class="text-muted small">Вже маєте акаунт?</span>
+                    <a href="{% url 'login' %}" class="fw-bold text-decoration-none text-info">Увійти</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
 <script>
     document.querySelectorAll('form input').forEach(input => {
         input.classList.add('form-control');
+        input.classList.add('bg-dark');
+        input.classList.add('text-white');
+        input.classList.add('border-secondary');
     });
 </script>
-
 {% endblock %}

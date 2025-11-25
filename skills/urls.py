@@ -17,4 +17,6 @@ urlpatterns = [
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('ai-generator/', views.ai_generator, name='ai_generator'),
     path('category/delete/<path:category_name>/', views.category_delete, name='category_delete'),
+    path('settings/', views.settings_view, name='settings'),
+    path('feedback/', views.feedback_view, name='feedback'),
 ]

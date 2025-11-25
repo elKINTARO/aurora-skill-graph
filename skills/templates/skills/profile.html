@@ -8,17 +8,22 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-auto">
-                    {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar.url }}"
-                             class="rounded-circle border border-3 border-white shadow-sm"
-                             style="width: 100px; height: 100px; object-fit: cover;"
-                             alt="{{ user.username }}">
-                    {% else %}
-                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white shadow-sm"
-                             style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: bold;">
+                    <div class="position-relative" style="width: 100px; height: 100px;">
+
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border border-3 border-white shadow-sm position-absolute top-0 start-0 w-100 h-100"
+                             style="font-size: 3rem; font-weight: bold; z-index: 1;">
                             {{ user.username|slice:":1"|upper }}
                         </div>
-                    {% endif %}
+
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}"
+                                 alt="Avatar"
+                                 class="rounded-circle border border-3 border-white shadow-sm position-absolute top-0 start-0 w-100 h-100"
+                                 style="object-fit: cover; z-index: 2;"
+                                 onerror="this.style.display='none'">
+                                 {% endif %}
+
+                    </div>
                 </div>
 
                 <div class="col">
@@ -45,7 +50,7 @@
                         {% endif %}
                         {% if user.profile.website_link %}
                             <a href="{{ user.profile.website_link }}" target="_blank" class="btn btn-sm btn-outline-secondary shadow-sm">
-                                🌐 Сайт
+                                <i class="bi bi-globe"></i> Сайт
                             </a>
                         {% endif %}
                     </div>
@@ -53,7 +58,7 @@
 
                 <div class="col-auto">
                     <a href="{% url 'profile_edit' %}" class="btn btn-outline-secondary shadow-sm">
-                        ⚙️ Редагувати
+                        <i class="bi bi-gear-fill"></i> Редагувати
                     </a>
                 </div>
             </div>

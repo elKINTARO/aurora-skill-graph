@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Sum, F
@@ -6,16 +5,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Skill, UserSkillProgress, SkillDependency
 from django.views.decorators.cache import never_cache
-from .forms import SkillForm, DependencyForm
 from .gamification import get_rank_info
 from django.contrib.auth.models import User
-from django.db.models import Case, When, IntegerField
-from .forms import UserUpdateForm, ProfileUpdateForm
+from django.db.models import Case, When, IntegerField, Q
+from .forms import SkillForm, DependencyForm, UserUpdateForm, ProfileUpdateForm, SettingsForm, FeedbackForm
 from .ai_service import generate_roadmap
 from django.utils.text import slugify
-from youtubesearchpython import VideosSearch
 import uuid
-import time
 
 @login_required
 def user_profile(request):
@@ -113,7 +109,6 @@ def change_status(request, skill_slug, new_status):
 @login_required
 def skill_detail(request, skill_slug):
     skill = get_object_or_404(Skill, slug=skill_slug, author=request.user)
-
     try:
         progress = UserSkillProgress.objects.get(user=request.user, skill=skill)
         skill.my_status = progress.status
@@ -135,11 +130,15 @@ def skill_detail(request, skill_slug):
 
     mermaid_graph = ["graph TD"]
 
-    mermaid_graph.append("classDef done fill:#d1e7dd,stroke:#0f5132,stroke-width:2px;")
-    mermaid_graph.append("classDef in_progress fill:#fff3cd,stroke:#856404,stroke-width:2px;")
-    mermaid_graph.append("classDef todo fill:#f8f9fa,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5;")
-    mermaid_graph.append("classDef locked fill:#e9ecef,stroke:#adb5bd,stroke-width:1px;")
-    mermaid_graph.append("classDef current fill:#cfe2ff,stroke:#0d6efd,stroke-width:4px;")
+    mermaid_graph.append("classDef done fill:#198754,stroke:#198754,stroke-width:2px,color:#fff;")
+    mermaid_graph.append("classDef in_progress fill:#ffc107,stroke:#ffc107,stroke-width:2px,color:#000;")
+    mermaid_graph.append(
+        "classDef todo fill:transparent,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5,color:#e9ecef;")
+    mermaid_graph.append("classDef locked fill:#343a40,stroke:#adb5bd,stroke-width:1px,color:#6c757d;")
+    mermaid_graph.append("classDef current fill:#0d6efd,stroke:#0d6efd,stroke-width:4px,color:#fff;")
+
+    def pad(text):
+        return f" {text} "
 
     for req in skill.requires.all():
         parent = req.from_skill
@@ -148,13 +147,11 @@ def skill_detail(request, skill_slug):
         except UserSkillProgress.DoesNotExist:
             p_status = 'todo'
 
-        mermaid_graph.append(f'N{parent.id}["{parent.title}"] --> N{skill.id}')
-
+        mermaid_graph.append(f'N{parent.id}["{pad(parent.title)}"] --> N{skill.id}')
         mermaid_graph.append(f'class N{parent.id} {p_status};')
-
         mermaid_graph.append(f'click N{parent.id} "/skill/{parent.slug}/"')
 
-    mermaid_graph.append(f'N{skill.id}["{skill.title}"]')
+    mermaid_graph.append(f'N{skill.id}["{pad(skill.title)}"]')
     mermaid_graph.append(f'class N{skill.id} current;')
 
     for req in skill.required_by.all():
@@ -164,8 +161,7 @@ def skill_detail(request, skill_slug):
         except UserSkillProgress.DoesNotExist:
             c_status = 'todo'
 
-        mermaid_graph.append(f'N{skill.id} --> N{child.id}["{child.title}"]')
-
+        mermaid_graph.append(f'N{skill.id} --> N{child.id}["{pad(child.title)}"]')
         mermaid_graph.append(f'class N{child.id} {c_status};')
         mermaid_graph.append(f'click N{child.id} "/skill/{child.slug}/"')
 
@@ -268,7 +264,7 @@ def skill_remove_dependency(request, skill_slug, dependency_id):
 
 @login_required
 def leaderboard(request):
-    users = User.objects.annotate(
+    users = User.objects.filter(profile__is_public=True).annotate(  # <--- ДОДАВ ФІЛЬТР ТУТ
         total_xp=Sum(
             Case(
                 When(skill_progress__status='done', then=F('skill_progress__skill__difficulty') * 10),
@@ -386,3 +382,31 @@ def category_delete(request, category_name):
         skills_to_delete.delete()
         return redirect('skill_list')
     return redirect('skill_list')
+
+
+@login_required
+def settings_view(request):
+    if request.method == 'POST':
+        form = SettingsForm(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect('settings')
+    else:
+        form = SettingsForm(instance=request.user.profile)
+
+    return render(request, 'skills/settings.html', {'form': form})
+
+
+@login_required
+def feedback_view(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.user = request.user
+            feedback.save()
+            return render(request, 'skills/feedback_success.html')
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'skills/feedback.html', {'form': form})

@@ -1,0 +1,73 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="aurora-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00d2ff;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#5e72ff;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#9c27b0;stop-opacity:1" />
+        </linearGradient>
+
+        <filter id="glow-intense" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+         <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <g filter="url(#glow-soft)" opacity="0.8">
+        <path d="M256 120L80 200L256 280L432 200L256 120Z" fill="none" stroke="url(#aurora-grad)" stroke-width="3"/>
+        <path d="M120 218V310C120 350 180 380 256 380C332 380 392 350 392 310V218" fill="none" stroke="url(#aurora-grad)" stroke-width="3"/>
+    </g>
+
+    <g filter="url(#glow-intense)">
+        <g stroke="url(#aurora-grad)" stroke-width="4" stroke-linecap="round" opacity="0.9">
+            <line x1="80" y1="200" x2="50" y2="130" />
+            <line x1="50" y1="130" x2="140" y2="80" />
+            <line x1="140" y1="80" x2="256" y2="120" />
+            <line x1="80" y1="200" x2="60" y2="300" />
+            <line x1="60" y1="300" x2="160" y2="380" />
+            <line x1="120" y1="310" x2="60" y2="300" />
+
+            <line x1="432" y1="200" x2="460" y2="130" />
+            <line x1="460" y1="130" x2="370" y2="80" />
+            <line x1="370" y1="80" x2="256" y2="120" />
+            <line x1="432" y1="200" x2="450" y2="300" />
+            <line x1="450" y1="300" x2="350" y2="380" />
+            <line x1="392" y1="310" x2="450" y2="300" />
+
+            <line x1="160" y1="380" x2="256" y2="420" />
+            <line x1="350" y1="380" x2="256" y2="420" />
+            <line x1="256" y1="280" x2="256" y2="420" />
+            <line x1="140" y1="80" x2="370" y2="80" stroke-width="2" opacity="0.6"/> </g>
+
+        <g>
+            <circle cx="50" cy="130" r="14" fill="#00d2ff"/>
+            <circle cx="140" cy="80" r="10" fill="#5e72ff"/>
+            <circle cx="460" cy="130" r="14" fill="#9c27b0"/>
+            <circle cx="370" cy="80" r="10" fill="#9c27b0"/>
+
+            <circle cx="80" cy="200" r="8" fill="#00d2ff"/>
+            <circle cx="432" cy="200" r="8" fill="#9c27b0"/>
+            <circle cx="256" cy="280" r="8" fill="url(#aurora-grad)"/>
+
+            <circle cx="60" cy="300" r="14" fill="#00d2ff"/>
+            <circle cx="160" cy="380" r="10" fill="#5e72ff"/>
+            <circle cx="450" cy="300" r="14" fill="#9c27b0"/>
+            <circle cx="350" cy="380" r="10" fill="#9c27b0"/>
+            <circle cx="256" cy="420" r="16" fill="url(#aurora-grad)"/> </g>
+    </g>
+
+    <g filter="url(#glow-intense)">
+        <circle cx="256" cy="200" r="10" fill="url(#aurora-grad)"/>
+        <line x1="256" y1="200" x2="340" y2="320" stroke="url(#aurora-grad)" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="340" cy="320" r="14" fill="#9c27b0"/>
+    </g>
+</svg>
