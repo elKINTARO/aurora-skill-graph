@@ -39,8 +39,10 @@ def user_profile(request):
     return render(request, 'skills/profile.html', context)
 
 @never_cache
-@login_required
 def skill_list(request):
+    if not request.user.is_authenticated:
+        return render(request, 'landing.html')
+
     skills = Skill.objects.filter(author=request.user).prefetch_related(
         'requires__from_skill',
         'required_by__to_skill'

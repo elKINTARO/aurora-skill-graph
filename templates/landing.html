@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Ласкаво просимо | Aurora SkillGraph{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <div class="mb-4">
+        <span style="font-size: 5rem;">🌌</span>
+    </div>
+    <h1 class="display-4 fw-bold text-primary">Aurora SkillGraph</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4 text-muted">
+            Перетворіть хаос навчання на чіткий план.
+            Будуйте графи знань, використовуйте AI для генерації роадмапів
+            та відстежуйте свій прогрес з елементами гейміфікації.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                🚀 Почати безкоштовно
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">
+                Увійти
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5" id="features">
+    <h2 class="pb-2 border-bottom text-center">Чому Aurora?</h2>
+
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3">🤖</div>
+                    <h3 class="fs-4">AI Генератор</h3>
+                    <p>Не знаєте з чого почати? Просто напишіть тему, і штучний інтелект побудує для вас детальний план навчання за секунди.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3">🕸️</div>
+                    <h3 class="fs-4">Візуалізація</h3>
+                    <p>Дивіться на свої знання як на карту. Розумійте зв'язки між темами та бачте повну картину свого розвитку.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3">🏆</div>
+                    <h3 class="fs-4">Гейміфікація</h3>
+                    <p>Отримуйте XP за кожну вивчену навичку, підвищуйте свій рівень та змагайтеся з іншими у таблиці лідерів.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
