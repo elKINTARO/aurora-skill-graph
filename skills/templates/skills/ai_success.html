@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}План готовий! | Aurora{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8 text-center">
+
+        <div class="mb-4">
+            <span style="font-size: 4rem;">🎉</span>
+            <h1 class="display-5 fw-bold text-primary">План готовий!</h1>
+            <p class="lead text-muted">
+                Штучний інтелект створив дорожню карту для вивчення теми: <br>
+                <strong>"{{ topic }}"</strong>
+            </p>
+        </div>
+
+        <div class="card shadow border-0 mb-5">
+            <div class="card-header bg-light border-bottom-0">
+                <h5 class="mb-0">👀 Попередній перегляд ({{ skills_count }} навичок)</h5>
+            </div>
+            <div class="card-body bg-white">
+                <pre class="mermaid">
+                    {{ mermaid_graph|safe }}
+                </pre>
+            </div>
+        </div>
+
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
+            <a href="{% url 'skill_list' %}?category=🤖 AI: {{ topic }}" class="btn btn-primary btn-lg px-4 gap-3">
+                🚀 Перейти до навчання
+            </a>
+            <a href="{% url 'ai_generator' %}" class="btn btn-outline-secondary btn-lg px-4">
+                Створити ще один
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

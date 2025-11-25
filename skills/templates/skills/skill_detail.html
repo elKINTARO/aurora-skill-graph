@@ -36,10 +36,19 @@
                     {% if skill.get_video_id %}
                         <div class="ratio ratio-16x9 mb-4 shadow-sm rounded overflow-hidden bg-dark">
                             <iframe
-                                src="https://www.youtube.com/embed/{{ skill.get_video_id }}?rel=0"
+                                src="https://www.youtube-nocookie.com/embed/{{ skill.get_video_id }}?rel=0"
                                 title="Video"
                                 allowfullscreen>
                             </iframe>
+                        </div>
+                    {% else %}
+                        <div class="mb-4 text-center p-4 bg-light rounded border border-dashed">
+                            <p class="text-muted mb-2">Відео ще не додано.</p>
+                            <a href="https://www.youtube.com/results?search_query={{ skill.title }} tutorial"
+                               target="_blank"
+                               class="btn btn-outline-danger btn-sm">
+                                🎬 Знайти на YouTube
+                            </a>
                         </div>
                     {% endif %}
 

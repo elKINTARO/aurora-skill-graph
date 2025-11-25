@@ -11,7 +11,7 @@ class Skill(models.Model):
     ]
 
     title = models.CharField(max_length=255, verbose_name="Назва навички")
-    slug = models.SlugField(unique=True, verbose_name="URL ідентифікатор")
+    slug = models.SlugField(unique=True, max_length=255, verbose_name="URL ідентифікатор")
     category = models.CharField(max_length=100, verbose_name="Категорія")
     difficulty = models.IntegerField(choices=DIFFICULTY_CHOICES, default=1, verbose_name="Складність")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='skills', null=True)
@@ -69,7 +69,6 @@ class SkillDependency(models.Model):
     def __str__(self):
         return f"{self.from_skill.title} -> {self.to_skill.title}"
 
-
 class UserSkillProgress(models.Model):
     STATUS_CHOICES = [
         ('todo', 'Треба вивчити'),
@@ -88,3 +87,16 @@ class UserSkillProgress(models.Model):
         unique_together = ('user', 'skill')
         verbose_name = "Прогрес користувача"
         verbose_name_plural = "Прогрес користувачів"
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+
+    avatar = models.ImageField(default='default.jpg', upload_to='profile_avatars', blank=True, verbose_name='Аватар')
+    bio = models.TextField(max_length=500, blank=True, verbose_name='Про мене')
+
+    github_link = models.URLField(max_length=200, blank=True, verbose_name='GitHub')
+    linkedin_link = models.URLField(max_length=200, blank=True, verbose_name='LinkedIn')
+    website_link = models.URLField(max_length=200, blank=True, verbose_name='Вебсайт')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'

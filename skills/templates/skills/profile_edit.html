@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Редагування профілю{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">✏️ Налаштування профілю</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h5 class="text-primary mt-2">Основна інформація</h5>
+                    <hr>
+                    {% for field in u_form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            <small class="text-danger">{{ field.errors }}</small>
+                        </div>
+                    {% endfor %}
+
+                    <h5 class="text-primary mt-4">Деталі профілю</h5>
+                    <hr>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Поточний аватар:</label>
+                        <div class="d-flex align-items-center">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" class="rounded-circle border me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% endif %}
+                            {{ p_form.avatar }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Про мене</label>
+                        {{ p_form.bio }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">GitHub</label>
+                            {{ p_form.github_link }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">LinkedIn</label>
+                            {{ p_form.linkedin_link }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'profile' %}" class="btn btn-secondary">Скасувати</a>
+                        <button type="submit" class="btn btn-success">Зберегти зміни</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

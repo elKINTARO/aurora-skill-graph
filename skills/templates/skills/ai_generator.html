@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}AI Генератор | Aurora{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6 text-center">
+        <h1 class="display-4 mb-3">✨ AI Roadmap</h1>
+        <p class="lead text-muted mb-5">
+            Напишіть тему, і мовна модель побудує для вас персональний план розвитку.
+        </p>
+
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form method="post" id="aiForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-primary">Що ви хочете вивчити?</label>
+                        <input type="text" name="topic" class="form-control form-control-lg text-center"
+                               placeholder="Наприклад: DevOps, React, Cooking..." required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 position-relative" id="generateBtn">
+                        <span id="btnText">🪄 Згенерувати</span>
+                        <div id="spinner" class="spinner-border text-light spinner-border-sm d-none" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <p class="mt-4 small text-muted">Powered by Google Gemini 2.0 Flash</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('aiForm').addEventListener('submit', function() {
+        var btn = document.getElementById('generateBtn');
+        var text = document.getElementById('btnText');
+        var spinner = document.getElementById('spinner');
+
+        btn.disabled = true;
+        text.textContent = "Мовна модель підбриає найкращий план...";
+        spinner.classList.remove('d-none');
+    });
+</script>
+{% endblock %}

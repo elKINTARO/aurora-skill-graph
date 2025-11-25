@@ -18,6 +18,9 @@
                 <a href="{% url 'leaderboard' %}" class="btn btn-outline-warning btn-sm me-2">
                     🏆 Рейтинг
                 </a>
+                <a href="{% url 'ai_generator' %}" class="btn btn-outline-primary btn-sm me-2">
+                    ✨ AI План
+                </a>
                 <form action="{% url 'logout' %}" method="post" class="d-inline">
                     {% csrf_token %}
                     <button class="btn btn-sm btn-outline-secondary">Вихід</button>

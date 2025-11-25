@@ -1,20 +1,19 @@
+import os
 from pathlib import Path
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
-
 DEBUG = config('DEBUG', default=False, cast=bool)
+GEMINI_API_KEY = config('GEMINI_API_KEY')
 
 ALLOWED_HOSTS = []
 
 #Video embending fix
 
 SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
-
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
-
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 INSTALLED_APPS = [
@@ -83,11 +82,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'
@@ -99,5 +96,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
-
 LOGOUT_REDIRECT_URL = '/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,5 +1,7 @@
 from django import forms
 from .models import Skill, SkillDependency
+from django.contrib.auth.models import User
+from .models import Profile
 
 class SkillForm(forms.ModelForm):
     class Meta:
@@ -40,3 +42,25 @@ class DependencyForm(forms.ModelForm):
         ).exclude(
             id__in=already_linked
         )
+
+
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['avatar', 'bio', 'github_link', 'linkedin_link']
+        widgets = {
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'github_link': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://github.com/...'}),
+            'linkedin_link': forms.URLInput(attrs={'class': 'form-control'}),
+        }

@@ -6,11 +6,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Skill, UserSkillProgress, SkillDependency
 from django.views.decorators.cache import never_cache
-from django.utils.text import slugify
 from .forms import SkillForm, DependencyForm
 from .gamification import get_rank_info
 from django.contrib.auth.models import User
 from django.db.models import Case, When, IntegerField
+from .forms import UserUpdateForm, ProfileUpdateForm
+from .ai_service import generate_roadmap
+from django.utils.text import slugify
+from youtubesearchpython import VideosSearch
+import uuid
+import time
 
 @login_required
 def user_profile(request):
@@ -274,3 +279,87 @@ def leaderboard(request):
         })
 
     return render(request, 'skills/leaderboard.html', {'leaders': leaderboard_data})
+
+
+@login_required
+def profile_edit(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            return redirect('profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+    return render(request, 'skills/profile_edit.html', context)
+
+
+@login_required
+def ai_generator(request):
+    if request.method == 'POST':
+        topic = request.POST.get('topic')
+
+        data = generate_roadmap(topic)
+
+        if data:
+            created_skills = []
+            created_skills_map = {}
+            for item in data.get('skills', []):
+                safe_title = item['title'][:50]
+                base_slug = slugify(safe_title)
+                unique_slug = f"{base_slug}-{request.user.id}-{uuid.uuid4().hex[:6]}"
+
+                ai_category = f"🤖 AI: {topic}"
+
+                skill = Skill.objects.create(
+                    title=item['title'],
+                    category=ai_category,
+                    difficulty=item['difficulty'],
+                    description=item['description'],
+                    video_url="",  # Пусто
+                    author=request.user,
+                    slug=unique_slug
+                )
+                created_skills_map[item['title']] = skill
+                created_skills.append(skill)
+
+            mermaid_graph = ["graph TD"]
+            mermaid_graph.append("classDef default fill:#e3f2fd,stroke:#0d6efd,stroke-width:2px;")
+
+            for dep in data.get('dependencies', []):
+                parent = created_skills_map.get(dep['from'])
+                child = created_skills_map.get(dep['to'])
+
+                if parent and child:
+                    SkillDependency.objects.create(
+                        from_skill=parent,
+                        to_skill=child,
+                        dependency_type=dep['type']
+                    )
+                    mermaid_graph.append(f'N{parent.id}["{parent.title}"] --> N{child.id}["{child.title}"]')
+
+            if len(mermaid_graph) == 2:
+                for s in created_skills:
+                    mermaid_graph.append(f'N{s.id}["{s.title}"]')
+
+            mermaid_string = "\n".join(mermaid_graph)
+
+            return render(request, 'skills/ai_success.html', {
+                'topic': topic,
+                'skills_count': len(created_skills),
+                'mermaid_graph': mermaid_string
+            })
+
+        else:
+            error = "AI не зміг згенерувати план. Спробуйте спростити тему (наприклад 'Python Basics')."
+            return render(request, 'skills/ai_generator.html', {'error': error})
+
+    return render(request, 'skills/ai_generator.html')
